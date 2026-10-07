@@ -1,0 +1,12 @@
+@page "/Error/{code:int?}"
+@model ErrorModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="glass auth-card text-center">
+    <div class="error-code text-gradient mb-2">@Model.Code</div>
+    <h2 class="h3 mb-2">@Model.Title</h2>
+    <p class="text-secondary mb-4">@Model.Message</p>
+    <a class="btn btn-gradient px-4" asp-page="/Index"><i class="bi bi-house me-2"></i>На главную</a>
+</div>

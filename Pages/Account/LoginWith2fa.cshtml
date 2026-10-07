@@ -1,0 +1,27 @@
+@page
+@model LoginWith2faModel
+@{
+    ViewData["Title"] = "Двухфакторная аутентификация";
+}
+
+<div class="glass auth-card">
+    <div class="auth-icon"><i class="bi bi-shield-lock"></i></div>
+    <h1 class="h3 text-center mb-1">Подтвердите вход</h1>
+    <p class="text-secondary text-center mb-4">Введите 6-значный код из Google Authenticator</p>
+
+    <form method="post" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger glass-alert"></div>
+        <input type="hidden" asp-for="RememberMe" />
+        <input type="hidden" asp-for="ReturnUrl" />
+
+        <div class="mb-4">
+            <input asp-for="Input.Code" class="form-control form-control-lg code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="8" autofocus />
+            <span asp-validation-for="Input.Code" class="text-danger small"></span>
+        </div>
+        <button type="submit" class="btn btn-gradient btn-lg w-100">Подтвердить</button>
+    </form>
+
+    <p class="text-center text-secondary mt-4 mb-0">
+        <a asp-page="./Login">← Вернуться ко входу</a>
+    </p>
+</div>

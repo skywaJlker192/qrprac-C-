@@ -1,0 +1,68 @@
+@page
+@{
+    ViewData["Title"] = "Главная";
+    var isAuth = User.Identity?.IsAuthenticated == true;
+    var fullName = User.FindFirst("FullName")?.Value ?? User.Identity?.Name;
+}
+
+<section class="hero glass text-center mb-5">
+    @if (isAuth)
+    {
+        <p class="text-secondary mb-2">С возвращением</p>
+        <h1 class="display-5 mb-3">Привет, <span class="text-gradient">@fullName</span>!</h1>
+        <p class="lead text-secondary mb-4">Управляйте задачами — все ваши данные защищены.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a class="btn btn-gradient btn-lg px-4" asp-page="/Todos/Index"><i class="bi bi-check2-square me-2"></i>Мои задачи</a>
+            <a class="btn btn-outline-light btn-lg px-4" asp-page="/Todos/Create"><i class="bi bi-plus-lg me-2"></i>Новая задача</a>
+        </div>
+        <div class="mt-4">
+            @foreach (var role in new[] { "Admin", "Author", "User" })
+            {
+                if (User.IsInRole(role))
+                {
+                    <span class="badge rounded-pill text-bg-secondary px-3 py-2 me-1"><i class="bi bi-person-badge me-1"></i>@role</span>
+                }
+            }
+        </div>
+    }
+    else
+    {
+        <h1 class="display-4 mb-3">Todo-менеджер с <span class="text-gradient">настоящей безопасностью</span></h1>
+        <p class="lead text-secondary mb-4">Регистрация, роли, политики доступа, JWT для API и защита от атак — в одном приложении.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a class="btn btn-gradient btn-lg px-4" asp-page="/Account/Register">Зарегистрироваться</a>
+            <a class="btn btn-outline-light btn-lg px-4" asp-page="/Account/Login">Войти</a>
+        </div>
+    }
+</section>
+
+<div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="glass feature">
+            <div class="feature-icon"><i class="bi bi-person-lock"></i></div>
+            <h5>Identity и роли</h5>
+            <p class="text-secondary mb-0">Admin, Author, User, блокировка после 5 неверных попыток.</p>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="glass feature">
+            <div class="feature-icon"><i class="bi bi-key"></i></div>
+            <h5>Политики доступа</h5>
+            <p class="text-secondary mb-0">Свои задачи — редактируем сами, админ — любые.</p>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="glass feature">
+            <div class="feature-icon"><i class="bi bi-braces"></i></div>
+            <h5>JWT API</h5>
+            <p class="text-secondary mb-0">Access + refresh токены, ротация и отзыв. Swagger внутри.</p>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="glass feature">
+            <div class="feature-icon"><i class="bi bi-qr-code"></i></div>
+            <h5>2FA и защита</h5>
+            <p class="text-secondary mb-0">Google Authenticator, CSRF, XSS, CSP и security headers.</p>
+        </div>
+    </div>
+</div>

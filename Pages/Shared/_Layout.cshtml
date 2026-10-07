@@ -1,0 +1,98 @@
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    var isAuth = User.Identity?.IsAuthenticated == true;
+    var displayName = User.FindFirst("FullName")?.Value ?? User.Identity?.Name ?? "";
+    var initial = string.IsNullOrWhiteSpace(displayName) ? "?" : displayName.Trim()[0].ToString().ToUpperInvariant();
+}
+<!DOCTYPE html>
+<html lang="ru" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    @* Антифоргери-токен для AJAX (Задание 5): JS читает его и шлёт в заголовке X-CSRF-TOKEN *@
+    <meta name="csrftoken" content="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
+    <title>@ViewData["Title"] — SecureTodo</title>
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <nav class="navbar navbar-expand-lg app-nav sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" asp-page="/Index">
+                <span class="brand-icon"><i class="bi bi-shield-check"></i></span> SecureTodo
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Меню">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="nav">
+                <ul class="navbar-nav me-auto">
+                    @if (isAuth)
+                    {
+                        <li class="nav-item"><a class="nav-link" asp-page="/Todos/Index"><i class="bi bi-check2-square me-1"></i>Задачи</a></li>
+                        @if (User.IsInRole("Author"))
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-page="/Author/Index"><i class="bi bi-pen me-1"></i>Для авторов</a></li>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-page="/Admin/Index"><i class="bi bi-people me-1"></i>Админ-панель</a></li>
+                        }
+                    }
+                    <li class="nav-item"><a class="nav-link" href="/swagger" target="_blank" rel="noopener"><i class="bi bi-braces me-1"></i>API</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    @if (isAuth)
+                    {
+                        <div class="dropdown">
+                            <button class="btn user-chip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="avatar">@initial</span>
+                                <span class="d-none d-md-inline">@displayName</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-page="/Account/Profile"><i class="bi bi-person-gear me-2"></i>Профиль и безопасность</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    @* Logout — только POST, с антифоргери-токеном *@
+                                    <form method="post" asp-page="/Account/Logout">
+                                        <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Выйти</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-light" asp-page="/Account/Login">Войти</a>
+                        <a class="btn btn-gradient" asp-page="/Account/Register">Зарегистрироваться</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4 py-lg-5">
+        @if (TempData["Success"] is string okMsg)
+        {
+            <div class="alert alert-success glass-alert d-flex align-items-center" role="alert"><i class="bi bi-check-circle-fill me-2"></i>@okMsg</div>
+        }
+        @if (TempData["Error"] is string errMsg)
+        {
+            <div class="alert alert-danger glass-alert d-flex align-items-center" role="alert"><i class="bi bi-exclamation-triangle-fill me-2"></i>@errMsg</div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="app-footer text-center text-secondary small py-4">
+        SecureTodo · ASP.NET Core · Identity · JWT · 2FA
+    </footer>
+
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

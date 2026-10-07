@@ -1,0 +1,64 @@
+@page
+@model ProfileModel
+@{
+    ViewData["Title"] = "Профиль";
+    var initial = string.IsNullOrWhiteSpace(Model.Account.FullName) ? "?" : Model.Account.FullName.Trim()[0].ToString().ToUpperInvariant();
+}
+
+<div class="row g-4 justify-content-center">
+    <div class="col-lg-4">
+        <div class="glass p-4 text-center h-100">
+            <div class="avatar avatar-lg mx-auto mb-3">@initial</div>
+            <h2 class="h4 mb-1">@Model.Account.FullName</h2>
+            <p class="text-secondary mb-3">@Model.Account.Email</p>
+            @foreach (var role in Model.Roles)
+            {
+                <span class="badge rounded-pill text-bg-secondary px-3 py-2 me-1"><i class="bi bi-person-badge me-1"></i>@role</span>
+            }
+            <hr class="my-4" />
+            <div class="d-flex justify-content-around">
+                <div><div class="h3 mb-0">@Model.TaskCount</div><div class="text-secondary small">задач</div></div>
+                <div><div class="h3 mb-0">@Model.ActiveRefreshTokens</div><div class="text-secondary small">API-сессий</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="glass p-4 mb-4">
+            <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+                <div>
+                    <h3 class="h5 mb-1"><i class="bi bi-shield-lock me-2"></i>Двухфакторная аутентификация</h3>
+                    <p class="text-secondary mb-0">Дополнительная защита: при входе нужен код из Google Authenticator или Microsoft Authenticator.</p>
+                </div>
+                @if (Model.TwoFactorEnabled)
+                {
+                    <span class="badge text-bg-success px-3 py-2"><i class="bi bi-check-circle me-1"></i>Включена</span>
+                }
+                else
+                {
+                    <span class="badge text-bg-secondary px-3 py-2">Выключена</span>
+                }
+            </div>
+            <div class="mt-3">
+                @if (Model.TwoFactorEnabled)
+                {
+                    <form method="post" asp-page-handler="Disable2fa">
+                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-shield-x me-1"></i>Отключить 2FA</button>
+                    </form>
+                }
+                else
+                {
+                    <a class="btn btn-gradient" asp-page="./Enable2fa"><i class="bi bi-qr-code me-1"></i>Включить 2FA</a>
+                }
+            </div>
+        </div>
+
+        <div class="glass p-4">
+            <h3 class="h5 mb-1"><i class="bi bi-braces me-2"></i>Сессии API</h3>
+            <p class="text-secondary">Если подозреваете компрометацию — отзовите все refresh-токены. Access-токены перестанут обновляться и истекут сами.</p>
+            <form method="post" asp-page-handler="RevokeTokens">
+                <button type="submit" class="btn btn-outline-warning"><i class="bi bi-box-arrow-right me-1"></i>Выйти на всех устройствах</button>
+            </form>
+        </div>
+    </div>
+</div>

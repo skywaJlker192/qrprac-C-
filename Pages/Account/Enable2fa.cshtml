@@ -1,0 +1,39 @@
+@page
+@model Enable2faModel
+@{
+    ViewData["Title"] = "Включение 2FA";
+}
+
+<div class="glass auth-card wide">
+    <div class="auth-icon"><i class="bi bi-qr-code-scan"></i></div>
+    <h1 class="h3 text-center mb-4">Включить двухфакторную аутентификацию</h1>
+
+    <div class="row g-4 align-items-center">
+        <div class="col-md-6 text-center">
+            <div class="qr-box">
+                <img src="@Model.QrCodeDataUri" alt="QR-код для аутентификатора" />
+            </div>
+            <p class="text-secondary small mt-3 mb-1">Не получается отсканировать? Введите ключ вручную:</p>
+            <kbd class="key-box">@Model.SharedKey</kbd>
+        </div>
+        <div class="col-md-6">
+            <ol class="text-secondary ps-3">
+                <li class="mb-2">Установите <strong class="text-light">Google Authenticator</strong> или Microsoft Authenticator.</li>
+                <li class="mb-2">Нажмите «+» → «Сканировать QR-код» и наведите камеру на код слева.</li>
+                <li class="mb-3">Введите 6-значный код из приложения ниже.</li>
+            </ol>
+
+            <form method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger glass-alert"></div>
+                <div class="mb-3">
+                    <input asp-for="Input.Code" class="form-control form-control-lg code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="000000" />
+                    <span asp-validation-for="Input.Code" class="text-danger small"></span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-gradient flex-grow-1">Подтвердить и включить</button>
+                    <a class="btn btn-outline-light" asp-page="./Profile">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

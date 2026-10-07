@@ -1,0 +1,41 @@
+## .NET
+bin/
+obj/
+out/
+publish/
+*.dll
+*.pdb
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+project.lock.json
+*.nupkg
+.nuget/
+
+## База данных SQLite (создаётся при первом запуске)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+
+## IDE
+.vs/
+.vscode/
+.idea/
+*.swp
+*.DotSettings.user
+.fleet/
+
+## Секреты и окружение
+appsettings.Development.json
+secrets.json
+.env
+
+## ОС
+.DS_Store
+Thumbs.db
+
+## Логи
+*.log
+logs/

@@ -1,0 +1,64 @@
+@page "/tasks"
+@model TasksIndexModel
+@inject IAuthorizationService Auth
+@{
+    ViewData["Title"] = "Задачи";
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="h2 mb-1">Задачи</h1>
+        <p class="text-secondary mb-0">Свои задачи можно менять, чужие — только смотреть.</p>
+    </div>
+    <a class="btn btn-gradient" asp-page="/Todos/Create"><i class="bi bi-plus-lg me-1"></i>Новая задача</a>
+</div>
+
+@if (!Model.Tasks.Any())
+{
+    <div class="glass text-center p-5">
+        <i class="bi bi-inbox display-4 text-secondary"></i>
+        <p class="lead mt-3 mb-4">Пока нет ни одной задачи.</p>
+        <a class="btn btn-gradient" asp-page="/Todos/Create">Создать первую</a>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var task in Model.Tasks)
+        {
+            // Resource-based авторизация прямо в Razor Page: кнопки видит только тот, кому можно
+            var canEdit = (await Auth.AuthorizeAsync(User, task, "CanEditTask")).Succeeded;
+
+            <div class="col-md-6 col-xl-4">
+                <div class="task-card glass @(task.IsCompleted ? "done" : "")">
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                        <h5 class="task-title mb-0">@task.Title</h5>
+                        <span class="badge js-status @(task.IsCompleted ? "text-bg-success" : "text-bg-warning")">@(task.IsCompleted ? "Выполнена" : "В работе")</span>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(task.Description))
+                    {
+                        <p class="task-desc mb-2">@task.Description</p>
+                    }
+
+                    <div class="text-secondary small">
+                        <i class="bi bi-person me-1"></i>@(task.User?.FullName ?? "—")
+                        · <i class="bi bi-clock me-1"></i>@task.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                    </div>
+
+                    @if (canEdit)
+                    {
+                        <div class="task-actions">
+                            <button type="button" class="btn btn-sm btn-outline-success js-toggle" data-url="@Url.Page("/Todos/Index", "Toggle", new { id = task.Id })">
+                                <i class="bi @(task.IsCompleted ? "bi-arrow-counterclockwise" : "bi-check2-circle")"></i>
+                                <span class="js-toggle-text">@(task.IsCompleted ? "Вернуть в работу" : "Отметить выполненной")</span>
+                            </button>
+                            <a class="btn btn-sm btn-outline-light" asp-page="/Todos/Edit" asp-route-id="@task.Id"><i class="bi bi-pencil me-1"></i>Редактировать</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-page="/Todos/Delete" asp-route-id="@task.Id"><i class="bi bi-trash me-1"></i>Удалить</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

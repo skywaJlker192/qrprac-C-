@@ -1,0 +1,11 @@
+@page "/author"
+@model AuthorIndexModel
+@{
+    ViewData["Title"] = "Раздел для авторов";
+}
+
+<div class="glass auth-card text-center">
+    <div class="auth-icon"><i class="bi bi-pen"></i></div>
+    <h1 class="h3 mb-2">Раздел для авторов</h1>
+    <p class="text-secondary mb-0">Эта страница доступна только пользователям с ролью <strong class="text-light">Author</strong>. Если вы её видите — роль применилась без повторного входа.</p>
+</div>

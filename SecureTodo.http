@@ -1,0 +1,71 @@
+### SecureTodo API — запросы для VS 2022 / Rider / VS Code (REST Client)
+### Порядок: 1) логин → 2) задачи с токеном → 3) создать → 4) без токена → 401 → 5) refresh и logout
+
+@host = https://localhost:7080
+
+### 1. Логин (получить access + refresh). Обычный пользователь — зарегистрируйте его на сайте.
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@todo.com",
+  "password": "Admin123!"
+}
+
+###
+@accessToken = {{login.response.body.accessToken}}
+@refreshToken = {{login.response.body.refreshToken}}
+
+### 2. Получить задачи (с токеном): пользователь видит свои, админ — все
+GET {{host}}/api/tasks
+Authorization: Bearer {{accessToken}}
+
+### 3. Создать задачу (с токеном). UserId берётся из токена, а не из тела
+POST {{host}}/api/tasks
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Купить хлеб",
+  "description": "Создано через API"
+}
+
+### 4. Получить задачи БЕЗ токена → 401 Unauthorized
+GET {{host}}/api/tasks
+
+### 5. Обновить задачу (id подставьте свой)
+PUT {{host}}/api/tasks/1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Купить хлеб и молоко",
+  "description": "Обновлено",
+  "isCompleted": true
+}
+
+### 6. Удалить задачу
+DELETE {{host}}/api/tasks/1
+Authorization: Bearer {{accessToken}}
+
+### 7. Refresh: новая пара токенов (старый refresh после этого НЕ работает → 401)
+# @name refresh
+POST {{host}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 8. Выход: отозвать refresh-токен
+POST {{host}}/api/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 9. Выйти на всех устройствах: отозвать ВСЕ refresh-токены пользователя
+POST {{host}}/api/auth/logout-all
+Authorization: Bearer {{accessToken}}
